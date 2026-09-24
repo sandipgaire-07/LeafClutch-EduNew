@@ -1,0 +1,46 @@
+// Single source of truth for site-wide settings.
+export const siteConfig = {
+  name: "LeafClutch Technologies",
+  shortName: "LeafClutch",
+  description:
+    "Practical, project-based technology courses in web development, AI, data science, design, cybersecurity and cloud — taught by working professionals in Nepal.",
+  currency: {
+    symbol: "Rs.",
+    locale: "en-IN", // lakh grouping (1,00,000), matching Nepali convention
+  },
+
+  // FAKE placeholder contacts for development — real values will come from
+  // Supabase site settings. Both are deliberately unreachable: the WhatsApp
+  // number is invalid and .example is a reserved domain. Null = not rendered.
+  contact: {
+    email: "admissions@leafclutch.example" as string | null,
+    phone: null as string | null,
+    /** International format, digits only, no "+". */
+    whatsapp: "9770000000000" as string | null,
+    address: null as string | null,
+  },
+  socials: [] as { label: string; href: string }[],
+
+  nav: {
+    login: "/login",
+    contact: "/contact",
+    about: "/about",
+    solutions: [
+      {
+        title: "For Corporate",
+        href: "/solutions/corporate",
+        description: "Upskill your teams with tailored, hands-on training.",
+      },
+      {
+        title: "For Academic",
+        href: "/solutions/academic",
+        description: "Industry-aligned programmes for colleges and schools.",
+      },
+      {
+        title: "For Government",
+        href: "/solutions/government",
+        description: "Digital capability building for public institutions.",
+      },
+    ],
+  },
+} as const;
