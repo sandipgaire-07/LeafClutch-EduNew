@@ -5,11 +5,9 @@ import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowUpRight,
   ChevronDown,
   ChevronRight,
   CircleAlert,
-  CircleCheck,
   Clock,
   Mail,
   MessageCircle,
@@ -18,6 +16,7 @@ import {
 
 import { CoursePrice } from "@/components/courses/CoursePrice";
 import { Container } from "@/components/layout/Container";
+import { HandoffNotice, type Handoff } from "@/components/shared/HandoffNotice";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -58,7 +57,7 @@ function Required() {
 
 export function EnrollmentForm({ courses, initialCourse, requestedUnavailable }: EnrollmentFormProps) {
   const channels = getEnrollmentChannels();
-  const [sent, setSent] = useState<{ channel: EnrollmentChannel; url: string } | null>(null);
+  const [sent, setSent] = useState<Handoff | null>(null);
 
   const {
     register,
@@ -306,36 +305,7 @@ export function EnrollmentForm({ courses, initialCourse, requestedUnavailable }:
               </>
             )}
 
-            <div role="status" aria-live="polite">
-              {sent && (
-                <div className="mt-5 flex gap-3 rounded-lg border border-green/40 bg-green/10 p-4 text-sm text-foreground">
-                  <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-navy" />
-                  <div>
-                    <p className="font-medium">
-                      {sent.channel === "whatsapp" ? "WhatsApp" : "Your email app"} should now be
-                      open with your enrollment details.
-                    </p>
-                    <p className="mt-1 text-muted-foreground">
-                      Send the message there to complete your request.{" "}
-                      <a
-                        href={sent.url}
-                        target={sent.channel === "whatsapp" ? "_blank" : undefined}
-                        rel={sent.channel === "whatsapp" ? "noopener noreferrer" : undefined}
-                        className="inline-flex items-center gap-0.5 font-medium text-navy underline underline-offset-4"
-                      >
-                        Didn’t open? Try again
-                        {sent.channel === "whatsapp" && (
-                          <>
-                            <ArrowUpRight aria-hidden className="size-3.5" />
-                            <span className="sr-only">(opens in a new tab)</span>
-                          </>
-                        )}
-                      </a>
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+            <HandoffNotice sent={sent} detail="your enrollment details" />
           </div>
         </form>
 

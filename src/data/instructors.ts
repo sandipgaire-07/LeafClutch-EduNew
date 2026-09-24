@@ -15,6 +15,7 @@ export const instructors: Instructor[] = [
     image: null,
     designation: "Senior Full-Stack Developer",
     bio: "Works across React, Node.js and cloud infrastructure, and mentors junior developers on writing maintainable, well-tested code.",
+    
   },
   {
     id: "ins-3",

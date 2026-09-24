@@ -6,9 +6,19 @@ import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
-export function CTA() {
+interface CTAProps {
+  title?: string;
+  description?: string;
+  className?: string;
+}
+
+export function CTA({
+  title = "Not sure where to start?",
+  description = "Tell us what you want to build and we will help you choose a course that fits your goals and schedule.",
+  className,
+}: CTAProps) {
   return (
-    <section aria-labelledby="cta-heading" className="pb-16 sm:pb-24">
+    <section aria-labelledby="cta-heading" className={cn("pb-16 sm:pb-24", className)}>
       <Container>
         <div className="relative overflow-hidden rounded-2xl bg-navy-deep px-6 py-12 sm:px-12 sm:py-16">
           <div
@@ -18,11 +28,10 @@ export function CTA() {
           <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-xl">
               <h2 id="cta-heading" className="text-3xl leading-tight font-semibold text-white sm:text-4xl">
-                Not sure where to start?
+                {title}
               </h2>
               <p className="mt-4 text-base leading-relaxed text-white/70 sm:text-lg">
-                Tell us what you want to build and we will help you choose a course that fits your
-                goals and schedule.
+                {description}
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">

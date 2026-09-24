@@ -1,27 +1,10 @@
 import Image from "next/image";
 import { createElement } from "react";
-import {
-  Award,
-  BriefcaseBusiness,
-  CalendarClock,
-  FolderCode,
-  RefreshCw,
-  UsersRound,
-  type LucideIcon,
-} from "lucide-react";
 
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/layout/SectionHeading";
-import type { Feature, FeatureIcon } from "@/types/content";
-
-const featureIcons: Record<FeatureIcon, LucideIcon> = {
-  mentor: UsersRound,
-  projects: FolderCode,
-  certificate: Award,
-  flexible: CalendarClock,
-  curriculum: RefreshCw,
-  career: BriefcaseBusiness,
-};
+import { featureIcons } from "@/components/shared/feature-icons";
+import type { Feature } from "@/types/content";
 
 interface WhyChooseUsProps {
   features: Feature[];

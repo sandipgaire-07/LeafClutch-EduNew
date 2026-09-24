@@ -75,6 +75,11 @@ export async function getCourseCurriculum(courseId: string): Promise<CourseModul
     }));
 }
 
+/** All mentors, for the About page. */
+export async function getInstructors(): Promise<Instructor[]> {
+  return instructors;
+}
+
 export async function getCourseInstructors(courseId: string): Promise<Instructor[]> {
   return courseInstructors
     .filter((link) => link.course_id === courseId)

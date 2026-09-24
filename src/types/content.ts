@@ -30,6 +30,7 @@ export interface StatItem {
 }
 
 export type FeatureIcon =
+  | "practical"
   | "mentor"
   | "projects"
   | "certificate"
