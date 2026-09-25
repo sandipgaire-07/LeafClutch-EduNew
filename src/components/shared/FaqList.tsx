@@ -15,6 +15,7 @@ const categoryLabels: Record<FaqCategory, string> = {
   general: "General",
   course: "Course",
   enrollment: "Enrollment",
+  payment: "Payment",
   certificate: "Certificate",
 };
 

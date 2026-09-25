@@ -1,5 +1,3 @@
-import { contactInfo } from "@/data/contact";
-
 // Single source of truth for site-wide settings.
 export const siteConfig = {
   name: "LeafClutch Technologies",
@@ -11,16 +9,8 @@ export const siteConfig = {
     locale: "en-IN", // lakh grouping (1,00,000), matching Nepali convention
   },
 
-  // FAKE placeholder contacts, defined in data/contact.ts (the Contact page's
-  // source). Real values will come from Supabase site settings. Null = not rendered.
-  contact: {
-    email: contactInfo.email,
-    phone: contactInfo.phone,
-    /** International format, digits only, no "+". */
-    whatsapp: contactInfo.whatsapp,
-    address: contactInfo.address,
-  },
-  socials: [] as { label: string; href: string }[],
+  // Contact details, WhatsApp and social links live in Supabase (site_settings)
+  // and are read with getSiteSettings() from lib/content.
 
   nav: {
     login: "/login",

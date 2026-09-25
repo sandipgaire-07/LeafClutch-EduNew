@@ -59,9 +59,11 @@ export function Testimonials({
                   <PersonAvatar name={testimonial.name} image={testimonial.image} />
                   <div>
                     <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {testimonial.designation ?? testimonial.course_name}
-                    </p>
+                    {(testimonial.designation ?? testimonial.course_name) && (
+                      <p className="text-sm text-muted-foreground">
+                        {testimonial.designation ?? testimonial.course_name}
+                      </p>
+                    )}
                   </div>
                 </figcaption>
               </figure>

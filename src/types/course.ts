@@ -1,3 +1,4 @@
+import type { Faq } from "@/types/content";
 import type { TrainingType } from "@/types/training";
 
 export type CourseStatus = "draft" | "published" | "archived";
@@ -9,7 +10,7 @@ export interface CourseCategory {
   name: string;
   short_name: string;
   slug: string;
-  description: string;
+  description: string | null;
   display_order: number;
   image_url: string | null;
 }
@@ -71,6 +72,8 @@ export interface Instructor {
   image: string | null;
   designation: string;
   bio: string;
+  linkedin_url: string | null;
+  is_active: boolean;
 }
 
 /** Join between courses and instructors. */
@@ -78,23 +81,6 @@ export interface CourseInstructor {
   course_id: string;
   instructor_id: string;
   display_order: number;
-}
-
-export type PaymentMethodType = "wallet" | "qr" | "bank";
-
-export interface PaymentMethod {
-  id: string;
-  name: string;
-  type: PaymentMethodType;
-  description: string;
-  is_active: boolean;
-  display_order: number;
-}
-
-/** Join between courses and the payment methods they accept. */
-export interface CoursePaymentMethod {
-  course_id: string;
-  payment_method_id: string;
 }
 
 export interface CourseInstallment {
@@ -114,3 +100,12 @@ export interface CourseNavGroup {
 
 /** Course as stored; `category` is resolved by the data layer. */
 export type CourseRecord = Omit<Course, "category">;
+
+/** Everything the /courses/[slug] page needs, loaded in one query. */
+export interface CourseDetail extends Course {
+  benefits: CourseBenefit[];
+  modules: CourseModuleWithLessons[];
+  instructors: Instructor[];
+  installments: CourseInstallment[];
+  faqs: Faq[];
+}

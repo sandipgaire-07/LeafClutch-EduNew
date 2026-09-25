@@ -1,10 +1,6 @@
-import {
-  buildMailtoUrl,
-  buildWhatsAppUrl,
-  sendEnrollment,
-  type EnrollmentChannel,
-} from "@/lib/enrollment";
+import { buildMailtoUrl, sendEnrollment, type EnrollmentChannel } from "@/lib/enrollment";
 import type { ContactFormValues } from "@/lib/validation/contact";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import type { ContactInfo } from "@/types/contact";
 
 // Contact form delivery. Like enrollment, it hands the message to the user's
@@ -34,13 +30,10 @@ export function getContactUrl(
   channels: ContactChannels,
 ): string | null {
   const message = buildContactMessage(values);
+  const targetEmail = channels.email?.trim() || "info@leafclutch.com";
 
-  if (channel === "whatsapp") {
-    return channels.whatsapp ? buildWhatsAppUrl(channels.whatsapp, message) : null;
-  }
-  return channels.email
-    ? buildMailtoUrl(channels.email, `Website enquiry from ${values.name}`, message)
-    : null;
+  if (channel === "whatsapp") return buildWhatsAppUrl(channels.whatsapp, message);
+  return buildMailtoUrl(targetEmail, `Website enquiry from ${values.name}`, message);
 }
 
 /** Hands the message off. The one function to replace when messages are stored server-side. */

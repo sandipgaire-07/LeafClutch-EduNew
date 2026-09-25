@@ -4,12 +4,16 @@ import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Container } from "@/components/layout/Container";
 import { Logo } from "@/components/layout/Logo";
 import { siteConfig } from "@/config/site";
+import { getSiteSettings } from "@/lib/content";
 import { coursesHref } from "@/lib/course-display";
 import { getCourseCategories } from "@/lib/courses";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export async function Footer() {
-  const categories = await getCourseCategories();
-  const { contact, socials, nav } = siteConfig;
+  const [categories, contact] = await Promise.all([getCourseCategories(), getSiteSettings()]);
+  const { nav } = siteConfig;
+  const socials = contact.social_links;
+  const whatsappUrl = buildWhatsAppUrl(contact.whatsapp);
 
   const columns = [
     {
@@ -41,11 +45,7 @@ export async function Footer() {
   const contactItems = [
     contact.email && { icon: Mail, label: contact.email, href: `mailto:${contact.email}` },
     contact.phone && { icon: Phone, label: contact.phone, href: `tel:${contact.phone}` },
-    contact.whatsapp && {
-      icon: MessageCircle,
-      label: "WhatsApp",
-      href: `https://wa.me/${contact.whatsapp}`,
-    },
+    whatsappUrl && { icon: MessageCircle, label: "WhatsApp", href: whatsappUrl },
     contact.address && { icon: MapPin, label: contact.address, href: null },
   ].filter((item) => !!item);
 

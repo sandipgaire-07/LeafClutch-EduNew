@@ -1,114 +1,59 @@
-import { categories } from "@/data/categories";
-import { courseBenefits } from "@/data/course-benefits";
-import { courses } from "@/data/courses";
-import { courseLessons, courseModules } from "@/data/curriculum";
-import { courseInstructors, instructors } from "@/data/instructors";
-import { courseInstallments, coursePaymentMethods, paymentMethods } from "@/data/payments";
+import "server-only";
+
+import { cache } from "react";
+
+import { byDisplayOrder, throwIfError } from "@/lib/data";
+import { getPublicClient } from "@/lib/supabase/public";
+import type { Faq } from "@/types/content";
 import type {
   Course,
   CourseBenefit,
   CourseCategory,
+  CourseDetail,
   CourseInstallment,
-  CourseModuleWithLessons,
+  CourseLesson,
+  CourseModule,
   CourseNavGroup,
-  CourseRecord,
   Instructor,
-  PaymentMethod,
 } from "@/types/course";
 import type { TrainingType } from "@/types/training";
 
-const byDisplayOrder = (a: { display_order: number }, b: { display_order: number }) =>
-  a.display_order - b.display_order;
+// Public course data. Pages call these and pass the results to components as
+// props. RLS guarantees only published courses (and their content) come back.
 
-// Course data access. Pages call these helpers and pass results to components
-// as props. They are async so the local data can later be swapped for an API
-// or database without touching any caller.
+const COURSE_WITH_CATEGORY = "*, category:course_categories!inner(*)";
 
-const categoriesById = new Map(categories.map((category) => [category.id, category]));
-
-function withCategory(record: CourseRecord): Course | null {
-  const category = categoriesById.get(record.category_id);
-  return category ? { ...record, category } : null;
-}
-
-function publishedCourses(): Course[] {
-  return courses
-    .filter((record) => record.status === "published")
-    .map(withCategory)
-    .filter((course): course is Course => course !== null);
-}
-
-export async function getPublishedCourses(): Promise<Course[]> {
-  return publishedCourses();
-}
-
-export async function getPublishedCourseBySlug(slug: string): Promise<Course | null> {
-  return publishedCourses().find((course) => course.slug === slug) ?? null;
-}
+/** Published courses with their category, oldest first. Deduplicated per request. */
+export const getPublishedCourses = cache(async (): Promise<Course[]> => {
+  const { data, error } = await getPublicClient()
+    .from("courses")
+    .select(COURSE_WITH_CATEGORY)
+    .eq("status", "published")
+    .order("created_at");
+  throwIfError(error, "load courses");
+  return data as Course[];
+});
 
 export async function getFeaturedCourses(): Promise<Course[]> {
-  return publishedCourses().filter((course) => course.is_featured);
+  return (await getPublishedCourses()).filter((course) => course.is_featured);
 }
+
 
 /** Published courses offered on a training page (corporate, academic, government). */
 export async function getCoursesForTraining(type: TrainingType): Promise<Course[]> {
-  return publishedCourses().filter((course) => course.training_types?.includes(type));
+  return (await getPublishedCourses()).filter((course) => course.training_types?.includes(type));
 }
 
 /** Categories that have at least one published course, in display order. */
 export async function getCourseCategories(): Promise<CourseCategory[]> {
-  const used = new Set(publishedCourses().map((course) => course.category_id));
-  return categories.filter((category) => used.has(category.id)).sort(byDisplayOrder);
-}
-
-/** Published course slugs, for static generation of detail pages. */
-export async function getPublishedCourseSlugs(): Promise<string[]> {
-  return publishedCourses().map((course) => course.slug);
-}
-
-export async function getCourseBenefits(courseId: string): Promise<CourseBenefit[]> {
-  return courseBenefits.filter((b) => b.course_id === courseId).sort(byDisplayOrder);
-}
-
-/** Modules in order, each with its lessons in order. */
-export async function getCourseCurriculum(courseId: string): Promise<CourseModuleWithLessons[]> {
-  return courseModules
-    .filter((m) => m.course_id === courseId)
-    .sort(byDisplayOrder)
-    .map((module) => ({
-      ...module,
-      lessons: courseLessons.filter((l) => l.module_id === module.id).sort(byDisplayOrder),
-    }));
-}
-
-/** All mentors, for the About page. */
-export async function getInstructors(): Promise<Instructor[]> {
-  return instructors;
-}
-
-export async function getCourseInstructors(courseId: string): Promise<Instructor[]> {
-  return courseInstructors
-    .filter((link) => link.course_id === courseId)
-    .sort(byDisplayOrder)
-    .map((link) => instructors.find((i) => i.id === link.instructor_id))
-    .filter((instructor): instructor is Instructor => instructor !== undefined);
-}
-
-/** Active payment methods this course accepts. */
-export async function getCoursePaymentMethods(courseId: string): Promise<PaymentMethod[]> {
-  const accepted = new Set(
-    coursePaymentMethods.filter((l) => l.course_id === courseId).map((l) => l.payment_method_id),
-  );
-  return paymentMethods.filter((m) => m.is_active && accepted.has(m.id)).sort(byDisplayOrder);
-}
-
-export async function getCourseInstallments(courseId: string): Promise<CourseInstallment[]> {
-  return courseInstallments.filter((i) => i.course_id === courseId).sort(byDisplayOrder);
+  const byId = new Map<string, CourseCategory>();
+  for (const course of await getPublishedCourses()) byId.set(course.category.id, course.category);
+  return [...byId.values()].sort(byDisplayOrder);
 }
 
 /** Categories with their published courses, for navigation menus. */
 export async function getCourseNavigation(): Promise<CourseNavGroup[]> {
-  const published = publishedCourses();
+  const published = await getPublishedCourses();
   return (await getCourseCategories()).map((category) => ({
     category,
     courses: published
@@ -122,7 +67,68 @@ export async function getRelatedCourses(
   categoryId: string,
   limit = 3,
 ): Promise<Course[]> {
-  return publishedCourses()
+  return (await getPublishedCourses())
     .filter((course) => course.category_id === categoryId && course.id !== courseId)
     .slice(0, limit);
 }
+
+/** Active instructors, for the About page's mentors section. */
+export async function getInstructors(): Promise<Instructor[]> {
+  const { data, error } = await getPublicClient().from("instructors").select("*").order("created_at");
+  throwIfError(error, "load instructors");
+  return data as Instructor[];
+}
+
+/** Light lookup (course + category), e.g. for the enroll page. */
+export async function getPublishedCourseBySlug(slug: string): Promise<Course | null> {
+  return (await getPublishedCourses()).find((course) => course.slug === slug) ?? null;
+}
+
+// ---------------------------------------------------------------------------
+// Course detail — one round trip for every section of /courses/[slug]
+// ---------------------------------------------------------------------------
+
+const COURSE_DETAIL = `
+  ${COURSE_WITH_CATEGORY},
+  benefits:course_benefits(*),
+  modules:course_modules(*, lessons:course_lessons(*)),
+  installments:course_installments(*),
+  course_instructors(display_order, instructor:instructors(*)),
+  faqs(*)
+`;
+
+interface CourseDetailRow extends Course {
+  benefits: CourseBenefit[];
+  modules: (CourseModule & { lessons: CourseLesson[] })[];
+  installments: CourseInstallment[];
+  // Inactive instructors are hidden by RLS and arrive as null.
+  course_instructors: { display_order: number; instructor: Instructor | null }[];
+  faqs: Faq[];
+}
+
+/** A published course with everything its detail page shows, or null. */
+export const getCourseBySlug = cache(async (slug: string): Promise<CourseDetail | null> => {
+  const { data, error } = await getPublicClient()
+    .from("courses")
+    .select(COURSE_DETAIL)
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+  throwIfError(error, `load course "${slug}"`);
+  if (!data) return null;
+
+  const { course_instructors, ...row } = data as CourseDetailRow;
+
+  return {
+    ...row,
+    benefits: row.benefits.sort(byDisplayOrder),
+    modules: row.modules
+      .sort(byDisplayOrder)
+      .map((module) => ({ ...module, lessons: module.lessons.sort(byDisplayOrder) })),
+    installments: row.installments.sort(byDisplayOrder),
+    instructors: course_instructors
+      .sort(byDisplayOrder)
+      .flatMap(({ instructor }) => (instructor ? [instructor] : [])),
+    faqs: row.faqs.sort(byDisplayOrder),
+  };
+});

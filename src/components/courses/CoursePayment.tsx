@@ -1,26 +1,17 @@
-import { Landmark, QrCode, Wallet, type LucideIcon } from "lucide-react";
-
 import { CourseDetailSection } from "@/components/courses/CourseDetailSection";
 import { formatPrice, getCoursePricing } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
-import type { Course, CourseInstallment, PaymentMethod, PaymentMethodType } from "@/types/course";
-
-const methodIcons: Record<PaymentMethodType, LucideIcon> = {
-  wallet: Wallet,
-  qr: QrCode,
-  bank: Landmark,
-};
+import type { Course, CourseInstallment } from "@/types/course";
 
 const segmentColors = ["bg-navy", "bg-blue", "bg-sky", "bg-blue-light"];
 
 interface CoursePaymentProps {
   course: Course;
-  methods: PaymentMethod[];
   installments: CourseInstallment[];
 }
 
-export function CoursePayment({ course, methods, installments }: CoursePaymentProps) {
-  if (methods.length === 0 && installments.length === 0) return null;
+export function CoursePayment({ course, installments }: CoursePaymentProps) {
+  if (installments.length === 0) return null;
 
   const { current } = getCoursePricing(course);
 
@@ -31,26 +22,6 @@ export function CoursePayment({ course, methods, installments }: CoursePaymentPr
       description="No payment is taken on this website. Our team confirms payment details after you enroll."
     >
       <div className="space-y-10">
-        {methods.length > 0 && (
-          <div>
-            <h3 className="text-base font-semibold text-foreground">Accepted payment methods</h3>
-            <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-              {methods.map((method) => {
-                const Icon = methodIcons[method.type];
-                return (
-                  <li key={method.id} className="rounded-xl border bg-white p-4">
-                    <Icon aria-hidden className="size-5 text-navy" />
-                    <p className="mt-3 text-sm font-semibold text-foreground">{method.name}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {method.description}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-
         {installments.length > 0 && (
           <div>
             <h3 className="text-base font-semibold text-foreground">Instalment plan</h3>

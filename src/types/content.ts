@@ -1,4 +1,4 @@
-export type FaqCategory = "general" | "course" | "enrollment" | "certificate";
+export type FaqCategory = "general" | "course" | "enrollment" | "payment" | "certificate";
 
 export interface Faq {
   id: string;
@@ -49,4 +49,33 @@ export interface Feature {
   icon: FeatureIcon;
   title: string;
   description: string;
+}
+
+export interface SocialLink {
+  label: string;
+  href: string;
+}
+
+/** The single row of global settings. */
+export interface SiteSettings {
+  email: string | null;
+  phone: string | null;
+  /** International format, digits only, no "+". */
+  whatsapp: string | null;
+  address: string | null;
+  social_links: SocialLink[];
+  /** Shown on the Contact page, e.g. { days: "Sunday – Friday", hours: "9:00 AM – 6:00 PM" }. */
+  opening_hours: { days: string; hours: string }[];
+}
+
+export interface Offer {
+  id: string;
+  course_id: string | null;
+  title: string;
+  description: string;
+  thumbnail: string | null;
+  price: number | null;
+  discount_price: number | null;
+  is_active: boolean;
+  display_order: number;
 }

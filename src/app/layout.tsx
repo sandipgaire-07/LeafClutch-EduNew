@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { PublicOnly } from "@/components/layout/PublicOnly";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -14,6 +15,9 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Every page reads live data from Supabase on each request.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
@@ -36,9 +40,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Navbar />
+        <PublicOnly>
+          <Navbar />
+        </PublicOnly>
         {children}
-        <Footer />
+        <PublicOnly>
+          <Footer />
+        </PublicOnly>
       </body>
     </html>
   );

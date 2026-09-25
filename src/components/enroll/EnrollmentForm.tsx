@@ -23,10 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { courseHref, learningModeLabels } from "@/lib/course-display";
 import {
-  getEnrollmentChannels,
   getEnrollmentUrl,
   sendEnrollment,
   type EnrollmentChannel,
+  type EnrollmentChannels,
 } from "@/lib/enrollment";
 import { cn } from "@/lib/utils";
 import { createEnrollmentSchema, type EnrollmentFormValues } from "@/lib/validation/enrollment";
@@ -39,6 +39,8 @@ export type EnrollmentCourse = Pick<
 
 interface EnrollmentFormProps {
   courses: EnrollmentCourse[];
+  /** From site_settings, loaded on the server. */
+  channels: EnrollmentChannels;
   /** Slug from ?course=, already validated on the server ("" if none). */
   initialCourse: string;
   /** ?course= named a course that doesn't exist or isn't published. */
@@ -55,8 +57,12 @@ function Required() {
   );
 }
 
-export function EnrollmentForm({ courses, initialCourse, requestedUnavailable }: EnrollmentFormProps) {
-  const channels = getEnrollmentChannels();
+export function EnrollmentForm({
+  courses,
+  channels,
+  initialCourse,
+  requestedUnavailable,
+}: EnrollmentFormProps) {
   const [sent, setSent] = useState<Handoff | null>(null);
 
   const {
@@ -77,7 +83,7 @@ export function EnrollmentForm({ courses, initialCourse, requestedUnavailable }:
     return handleSubmit((values) => {
       const course = courses.find((c) => c.slug === values.course);
       if (!course) return;
-      const url = getEnrollmentUrl(channel, { ...values, courseName: course.name });
+      const url = getEnrollmentUrl(channel, { ...values, courseName: course.name }, channels);
       if (!url) return;
       sendEnrollment(channel, url);
       setSent({ channel, url });

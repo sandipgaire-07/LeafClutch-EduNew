@@ -13,24 +13,10 @@ import { CoursePayment } from "@/components/courses/CoursePayment";
 import { CourseUdemy } from "@/components/courses/CourseUdemy";
 import { RelatedCourses } from "@/components/courses/RelatedCourses";
 import { Container } from "@/components/layout/Container";
-import { getCourseFAQs } from "@/lib/content";
-import {
-  getCourseBenefits,
-  getCourseCurriculum,
-  getCourseInstallments,
-  getCourseInstructors,
-  getCoursePaymentMethods,
-  getPublishedCourseBySlug,
-  getPublishedCourseSlugs,
-  getRelatedCourses,
-} from "@/lib/courses";
-
-export async function generateStaticParams() {
-  return (await getPublishedCourseSlugs()).map((slug) => ({ slug }));
-}
+import { getCourseBySlug, getRelatedCourses } from "@/lib/courses";
 
 export async function generateMetadata({ params }: PageProps<"/courses/[slug]">): Promise<Metadata> {
-  const course = await getPublishedCourseBySlug((await params).slug);
+  const course = await getCourseBySlug((await params).slug);
   if (!course) return {};
 
   return {
@@ -46,19 +32,12 @@ export async function generateMetadata({ params }: PageProps<"/courses/[slug]">)
 
 export default async function CoursePage({ params }: PageProps<"/courses/[slug]">) {
   // Unknown and unpublished courses both 404.
-  const course = await getPublishedCourseBySlug((await params).slug);
+  // One query loads every section; generateMetadata's call is deduplicated.
+  const course = await getCourseBySlug((await params).slug);
   if (!course) notFound();
 
-  const [benefits, curriculum, instructors, paymentMethods, installments, faqs, related] =
-    await Promise.all([
-      getCourseBenefits(course.id),
-      getCourseCurriculum(course.id),
-      getCourseInstructors(course.id),
-      getCoursePaymentMethods(course.id),
-      getCourseInstallments(course.id),
-      getCourseFAQs(course.id),
-      getRelatedCourses(course.id, course.category_id),
-    ]);
+  const related = await getRelatedCourses(course.id, course.category_id);
+  const { benefits, modules: curriculum, instructors, installments, faqs } = course;
 
   return (
     <main id="main" className="flex-1">
@@ -85,7 +64,7 @@ export default async function CoursePage({ params }: PageProps<"/courses/[slug]"
           <CourseDescription description={course.description} />
           <CourseBenefits benefits={benefits} />
           <CourseCurriculum modules={curriculum} pdfUrl={course.curriculum_pdf_url} />
-          <CoursePayment course={course} methods={paymentMethods} installments={installments} />
+          <CoursePayment course={course} installments={installments} />
           <CourseUdemy url={course.udemy_url} />
           <CourseInstructor instructors={instructors} />
           <CourseCertificate course={course} />

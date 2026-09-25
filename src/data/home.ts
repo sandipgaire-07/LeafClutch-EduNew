@@ -1,12 +1,4 @@
-import type { Feature, StatItem } from "@/types/content";
-
-// TODO: confirm these figures with LeafClutch before launch.
-export const homeStats: StatItem[] = [
-  { id: "students", value: "1,000+", label: "Students trained" },
-  { id: "courses", value: "20+", label: "Courses" },
-  { id: "mentors", value: "50+", label: "Industry mentors" },
-  { id: "projects", value: "100+", label: "Projects built" },
-];
+import type { Feature } from "@/types/content";
 
 export const whyChooseUsFeatures: Feature[] = [
   {

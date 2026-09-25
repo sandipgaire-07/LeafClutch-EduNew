@@ -2,6 +2,9 @@ import type { ImageAsset } from "@/types/about";
 
 export type TrainingType = "corporate" | "academic" | "government";
 
+/** Publication state of a row in the training_programs table (admin actions). */
+export type TrainingStatus = "draft" | "published";
+
 /** Icon names resolved to Lucide icons in components/training/training-icons. */
 export type TrainingIcon =
   | "Award"
@@ -111,6 +114,17 @@ export interface TrainingPageData {
     href: string;
   };
 }
+
+/**
+ * A training page's text (from the training_pages table). The lists and
+ * images are loaded separately and merged in to make TrainingPageData.
+ */
+export type TrainingPageCopy = Omit<TrainingPageData, "hero" | "whyChooseUs" | "process" | "programs"> & {
+  hero: Omit<TrainingPageData["hero"], "gallery">;
+  whyChooseUs: Omit<TrainingPageData["whyChooseUs"], "images" | "features">;
+  process: Omit<TrainingPageData["process"], "steps">;
+  programs: Omit<TrainingPageData["programs"], "items">;
+};
 
 export type TrainingMode = "online" | "on_site" | "hybrid";
 

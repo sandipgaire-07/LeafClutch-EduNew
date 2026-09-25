@@ -1,53 +1,132 @@
-import { aboutData, aboutFeatures, aboutStats, aboutValues, learningSteps } from "@/data/about";
-import { contactInfo, contactPageContent } from "@/data/contact";
-import { faqs } from "@/data/faqs";
-import { homeStats, whyChooseUsFeatures, whyChooseUsImages } from "@/data/home";
-import { testimonials } from "@/data/testimonials";
-import type { AboutPageData } from "@/types/about";
+import "server-only";
+
+import { cache } from "react";
+
+import { aboutData } from "@/data/about";
+import { contactPageContent } from "@/data/contact";
+import { whyChooseUsFeatures, whyChooseUsImages } from "@/data/home";
+import { byDisplayOrder, throwIfError } from "@/lib/data";
+import { getPublicClient } from "@/lib/supabase/public";
+import type { AboutPageData, AboutValue, LearningStep } from "@/types/about";
 import type { ContactInfo, ContactPageContent } from "@/types/contact";
-import type { Faq, TestimonialType } from "@/types/content";
+import type {
+  Faq,
+  Feature,
+  Offer,
+  SiteSettings,
+  StatItem,
+  Testimonial,
+  TestimonialType,
+} from "@/types/content";
 
-// Non-course content access. Same contract as lib/courses: async, so the
-// local data can be replaced by an API later without changing callers.
-
-const byDisplayOrder = (a: Faq, b: Faq) => a.display_order - b.display_order;
+// Non-course content. Course-specific FAQs come with the course (lib/courses).
 
 /** Active site-wide FAQs (not tied to a course). */
 export async function getSiteFAQs(): Promise<Faq[]> {
-  return faqs.filter((faq) => faq.is_active && faq.course_id === null).sort(byDisplayOrder);
+  const { data, error } = await getPublicClient()
+    .from("faqs")
+    .select("*")
+    .is("course_id", null)
+    .order("display_order");
+  throwIfError(error, "load FAQs");
+  return data as Faq[];
 }
 
-export async function getCourseFAQs(courseId: string): Promise<Faq[]> {
-  return faqs.filter((faq) => faq.is_active && faq.course_id === courseId).sort(byDisplayOrder);
+/** Featured testimonials of one type: student reviews (home page) or organisations (training pages). */
+export async function getFeaturedTestimonials(
+  limit = 3,
+  type: TestimonialType = "student",
+): Promise<Testimonial[]> {
+  const { data, error } = await getPublicClient()
+    .from("testimonials")
+    .select("*, course:courses(name)")
+    .eq("type", type)
+    .eq("is_featured", true)
+    .order("display_order")
+    .limit(limit);
+  throwIfError(error, "load testimonials");
+
+  return (data as (Testimonial & { course: { name: string } | null })[]).map(
+    ({ course, ...testimonial }) => ({ ...testimonial, course_name: course?.name ?? null }),
+  );
 }
 
-export async function getFeaturedTestimonials(limit = 3, type: TestimonialType = "student") {
-  return testimonials
-    .filter((t) => t.is_active && t.is_featured && t.type === type)
-    .slice(0, limit);
+const emptySettings: SiteSettings = {
+  email: null,
+  phone: null,
+  whatsapp: null,
+  address: null,
+  social_links: [],
+  opening_hours: [],
+};
+
+/** Global contact details and links. Missing settings render as "not configured". */
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
+  const { data, error } = await getPublicClient()
+    .from("site_settings")
+    .select("email, phone, whatsapp, address, social_links, opening_hours")
+    .maybeSingle();
+  throwIfError(error, "load site settings");
+  return (data as SiteSettings | null) ?? emptySettings;
+});
+
+export async function getActiveOffers(): Promise<Offer[]> {
+  const { data, error } = await getPublicClient().from("offers").select("*");
+  throwIfError(error, "load offers");
+  return (data as Offer[]).sort(byDisplayOrder);
 }
 
-export async function getHomeStats() {
-  return homeStats;
+/** Active home page stats ("1,000+ Students trained"), in display order. */
+export async function getHomeStats(): Promise<StatItem[]> {
+  const { data, error } = await getPublicClient()
+    .from("home_stats")
+    .select("id, value, label")
+    .order("display_order");
+  throwIfError(error, "load home stats");
+  return data as StatItem[];
 }
+
+// Marketing copy that has no table yet — still local.
 
 export async function getWhyChooseUs() {
   return { features: whyChooseUsFeatures, images: whyChooseUsImages };
 }
 
+type AboutItemRow = { id: string; section: "value" | "feature" | "learning_step"; icon: string; title: string; description: string };
+
+/** The About page: copy from data/about.ts; stats (same as the home page) and cards from Supabase. */
 export async function getAboutPageData(): Promise<AboutPageData> {
+  const [stats, items] = await Promise.all([
+    getHomeStats(),
+    getPublicClient().from("about_items").select("id, section, icon, title, description").order("display_order"),
+  ]);
+  throwIfError(items.error, "load about page items");
+
+  const rows = items.data as AboutItemRow[];
+  const inSection = (section: AboutItemRow["section"]) =>
+    rows
+      .filter((row) => row.section === section)
+      .map(({ id, icon, title, description }) => ({ id, icon, title, description }));
+
   return {
     content: aboutData,
-    stats: aboutStats,
-    values: aboutValues,
-    features: aboutFeatures,
-    learningSteps,
+    stats,
+    values: inSection("value") as AboutValue[],
+    features: inSection("feature") as Feature[],
+    learningSteps: inSection("learning_step") as LearningStep[],
   };
 }
 
-/** Will become the site-settings row in Supabase. */
+/** Contact details from site_settings, as the Contact page expects them. */
 export async function getContactInfo(): Promise<ContactInfo> {
-  return contactInfo;
+  const { address, phone, email, whatsapp, opening_hours } = await getSiteSettings();
+  return {
+    address,
+    phone,
+    email,
+    whatsapp,
+    openingHours: opening_hours.map((row, i) => ({ id: String(i), ...row })),
+  };
 }
 
 export async function getContactPageContent(): Promise<ContactPageContent> {

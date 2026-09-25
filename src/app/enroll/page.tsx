@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { EnrollmentForm, type EnrollmentCourse } from "@/components/enroll/EnrollmentForm";
+import { getSiteSettings } from "@/lib/content";
 import { getPublishedCourseBySlug, getPublishedCourses } from "@/lib/courses";
 
 type SearchParams = PageProps<"/enroll">["searchParams"];
@@ -20,7 +21,11 @@ export async function generateMetadata({ searchParams }: PageProps<"/enroll">): 
 }
 
 export default async function EnrollPage({ searchParams }: PageProps<"/enroll">) {
-  const [courses, slug] = await Promise.all([getPublishedCourses(), requestedSlug(searchParams)]);
+  const [courses, settings, slug] = await Promise.all([
+    getPublishedCourses(),
+    getSiteSettings(),
+    requestedSlug(searchParams),
+  ]);
 
   // Only the fields the form needs reach the client.
   const options: EnrollmentCourse[] = courses.map((c) => ({
@@ -38,6 +43,7 @@ export default async function EnrollPage({ searchParams }: PageProps<"/enroll">)
     <main id="main" className="flex-1">
       <EnrollmentForm
         courses={options}
+        channels={{ whatsapp: settings.whatsapp, email: settings.email }}
         initialCourse={initialCourse}
         requestedUnavailable={slug !== "" && initialCourse === ""}
       />

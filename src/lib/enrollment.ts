@@ -1,5 +1,5 @@
-import { siteConfig } from "@/config/site";
 import type { EnrollmentFormValues } from "@/lib/validation/enrollment";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 // Enrollment delivery, kept in one place. For now both channels hand off to
 // the user's own WhatsApp / email app; nothing is sent from the browser and no
@@ -30,33 +30,29 @@ export function buildEnrollmentMessage(request: EnrollmentRequest): string {
   return lines.join("\n");
 }
 
-export function buildWhatsAppUrl(number: string, text: string): string {
-  return `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(text)}`;
-}
-
 export function buildMailtoUrl(to: string, subject: string, body: string): string {
+  const target = to.trim() || "info@leafclutch.com";
   // encodeURIComponent (not URLSearchParams) so spaces become %20, which mail clients expect.
-  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:${encodeURIComponent(target)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-/** Which channels are configured. A channel without contact details is hidden. */
-export function getEnrollmentChannels() {
-  return {
-    whatsapp: siteConfig.contact.whatsapp,
-    email: siteConfig.contact.email,
-  };
+/** Contact details from site_settings. A channel set to null is hidden. */
+export interface EnrollmentChannels {
+  whatsapp: string | null;
+  email: string | null;
 }
 
 /** The pre-filled WhatsApp or mailto URL, or null if the channel is not configured. */
 export function getEnrollmentUrl(
   channel: EnrollmentChannel,
   request: EnrollmentRequest,
+  { whatsapp, email }: EnrollmentChannels,
 ): string | null {
-  const { whatsapp, email } = getEnrollmentChannels();
   const message = buildEnrollmentMessage(request);
+  const targetEmail = email?.trim() || "info@leafclutch.com";
 
-  if (channel === "whatsapp") return whatsapp ? buildWhatsAppUrl(whatsapp, message) : null;
-  return email ? buildMailtoUrl(email, `Enrollment request: ${request.courseName}`, message) : null;
+  if (channel === "whatsapp") return buildWhatsAppUrl(whatsapp, message);
+  return buildMailtoUrl(targetEmail, `Enrollment request: ${request.courseName}`, message);
 }
 
 /**
@@ -72,5 +68,11 @@ export function sendEnrollment(channel: EnrollmentChannel, url: string) {
     else window.location.href = url; // popup blocked
     return;
   }
-  window.location.href = url;
+  // Mailto link trigger: Using a temporary anchor tag is reliable across all browsers
+  const a = document.createElement("a");
+  a.href = url;
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }

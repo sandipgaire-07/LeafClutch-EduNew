@@ -58,7 +58,8 @@ export function ContactForm({ title, channels }: ContactFormProps) {
 
   const describedBy = (name: keyof ContactFormValues) =>
     errors[name] ? `contact-${name}-error` : undefined;
-  const noChannels = !channels.whatsapp && !channels.email;
+  const emailChannel = channels.email || "info@leafclutch.com";
+  const noChannels = !channels.whatsapp && !emailChannel;
 
   return (
     <form
@@ -156,7 +157,7 @@ export function ContactForm({ title, channels }: ContactFormProps) {
                   Send via WhatsApp
                 </Button>
               )}
-              {channels.email && (
+              {emailChannel && (
                 <Button
                   type={channels.whatsapp ? "button" : "submit"}
                   variant={channels.whatsapp ? "outline" : "default"}
