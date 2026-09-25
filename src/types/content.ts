@@ -11,12 +11,18 @@ export interface Faq {
   display_order: number;
 }
 
+export type TestimonialType = "student" | "corporate" | "academic" | "government";
+
 export interface Testimonial {
   id: string;
+  type: TestimonialType;
   name: string;
   image: string | null;
-  course_id: string;
-  course_name: string;
+  /** Set for student reviews of a course; null for organisation testimonials. */
+  course_id: string | null;
+  course_name: string | null;
+  /** Role and organisation, shown instead of the course, e.g. "HR Manager, Summit Logistics". */
+  designation: string | null;
   review: string;
   rating: number | null;
   is_active: boolean;

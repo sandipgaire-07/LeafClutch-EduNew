@@ -6,15 +6,25 @@ import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
+interface CTAAction {
+  label: string;
+  href: string;
+}
+
 interface CTAProps {
   title?: string;
   description?: string;
+  primaryAction?: CTAAction;
+  /** null hides the second button. */
+  secondaryAction?: CTAAction | null;
   className?: string;
 }
 
 export function CTA({
   title = "Not sure where to start?",
   description = "Tell us what you want to build and we will help you choose a course that fits your goals and schedule.",
+  primaryAction = { label: "Explore courses", href: "/courses" },
+  secondaryAction = { label: "Contact us now", href: siteConfig.nav.contact },
   className,
 }: CTAProps) {
   return (
@@ -36,24 +46,26 @@ export function CTA({
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/courses"
+                href={primaryAction.href}
                 className={cn(
                   buttonVariants({ size: "xl" }),
                   "bg-white text-navy hover:bg-white/90",
                 )}
               >
-                Explore courses
+                {primaryAction.label}
                 <ArrowRight data-icon="inline-end" aria-hidden />
               </Link>
-              <Link
-                href={siteConfig.nav.contact}
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "xl" }),
-                  "border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white",
-                )}
-              >
-                Contact us now
-              </Link>
+              {secondaryAction && (
+                <Link
+                  href={secondaryAction.href}
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "xl" }),
+                    "border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white",
+                  )}
+                >
+                  {secondaryAction.label}
+                </Link>
+              )}
             </div>
           </div>
         </div>

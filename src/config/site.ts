@@ -29,17 +29,17 @@ export const siteConfig = {
     solutions: [
       {
         title: "For Corporate",
-        href: "/solutions/corporate",
+        href: "/corporate-training",
         description: "Upskill your teams with tailored, hands-on training.",
       },
       {
         title: "For Academic",
-        href: "/solutions/academic",
+        href: "/academic-training",
         description: "Industry-aligned programmes for colleges and schools.",
       },
       {
         title: "For Government",
-        href: "/solutions/government",
+        href: "/government-training",
         description: "Digital capability building for public institutions.",
       },
     ],

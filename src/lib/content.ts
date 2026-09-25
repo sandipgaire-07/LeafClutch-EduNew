@@ -5,7 +5,7 @@ import { homeStats, whyChooseUsFeatures, whyChooseUsImages } from "@/data/home";
 import { testimonials } from "@/data/testimonials";
 import type { AboutPageData } from "@/types/about";
 import type { ContactInfo, ContactPageContent } from "@/types/contact";
-import type { Faq } from "@/types/content";
+import type { Faq, TestimonialType } from "@/types/content";
 
 // Non-course content access. Same contract as lib/courses: async, so the
 // local data can be replaced by an API later without changing callers.
@@ -21,8 +21,10 @@ export async function getCourseFAQs(courseId: string): Promise<Faq[]> {
   return faqs.filter((faq) => faq.is_active && faq.course_id === courseId).sort(byDisplayOrder);
 }
 
-export async function getFeaturedTestimonials(limit = 3) {
-  return testimonials.filter((t) => t.is_active && t.is_featured).slice(0, limit);
+export async function getFeaturedTestimonials(limit = 3, type: TestimonialType = "student") {
+  return testimonials
+    .filter((t) => t.is_active && t.is_featured && t.type === type)
+    .slice(0, limit);
 }
 
 export async function getHomeStats() {

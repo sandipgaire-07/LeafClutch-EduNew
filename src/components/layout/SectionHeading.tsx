@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-
 interface SectionHeadingProps {
   /** Used by the section's aria-labelledby. */
   id: string;
@@ -9,8 +8,6 @@ interface SectionHeadingProps {
   align?: "left" | "center";
   className?: string;
 }
-
-/** The shared eyebrow + heading + intro pattern used by every section. */
 export function SectionHeading({
   id,
   eyebrow,

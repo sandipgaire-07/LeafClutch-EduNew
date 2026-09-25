@@ -23,7 +23,19 @@ function Rating({ value }: { value: number }) {
   );
 }
 
-export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) {
+interface TestimonialsProps {
+  testimonials: Testimonial[];
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+}
+
+export function Testimonials({
+  testimonials,
+  eyebrow = "Student stories",
+  title = "Learners who built something real",
+  description = "Hear from students about their projects, their mentors and what came next.",
+}: TestimonialsProps) {
   if (testimonials.length === 0) return null;
 
   return (
@@ -31,9 +43,9 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
       <Container>
         <SectionHeading
           id="testimonials-heading"
-          eyebrow="Student stories"
-          title="Learners who built something real"
-          description="Hear from students about their projects, their mentors and what came next."
+          eyebrow={eyebrow}
+          title={title}
+          description={description}
         />
         <ul className="mt-12 grid gap-6 md:grid-cols-3">
           {testimonials.map((testimonial) => (
@@ -47,7 +59,9 @@ export function Testimonials({ testimonials }: { testimonials: Testimonial[] }) 
                   <PersonAvatar name={testimonial.name} image={testimonial.image} />
                   <div>
                     <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.course_name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {testimonial.designation ?? testimonial.course_name}
+                    </p>
                   </div>
                 </figcaption>
               </figure>

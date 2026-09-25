@@ -686,3 +686,33 @@
     animation: none;
   }
 }
+/* =========================================================
+   TRAINING HERO GALLERY
+   Before Swiper initialises, give slides the width and centring it will
+   compute, so the gallery doesn't change size on hydration. Keep
+   --gallery-spv in step with slidesPerView in TrainingGallery.tsx.
+   ========================================================= */
+
+.training-gallery {
+  --gallery-spv: 1.15;
+}
+
+@media (min-width: 40rem) {
+  .training-gallery {
+    --gallery-spv: 1.3;
+  }
+}
+
+@media (min-width: 64rem) {
+  .training-gallery {
+    --gallery-spv: 1.35;
+  }
+}
+
+.training-gallery:not(.swiper-initialized) .swiper-slide {
+  width: calc(100% / var(--gallery-spv));
+}
+
+.training-gallery:not(.swiper-initialized) .swiper-wrapper {
+  transform: translateX(calc((100% - 100% / var(--gallery-spv)) / 2));
+}

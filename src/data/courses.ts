@@ -23,6 +23,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: true,
     status: "published",
+    training_types: ["corporate", "government"],
   },
   {
     id: "course-generative-ai",
@@ -43,6 +44,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["corporate", "government"],
   },
   {
     id: "course-machine-learning",
@@ -63,6 +65,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["academic"],
   },
   {
     id: "course-mern",
@@ -83,6 +86,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: true,
     status: "published",
+    training_types: ["corporate", "academic"],
   },
   {
     id: "course-react-next",
@@ -103,6 +107,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["academic"],
   },
   {
     id: "course-django",
@@ -123,6 +128,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["government"],
   },
   {
     id: "course-data-science",
@@ -143,6 +149,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: true,
     status: "published",
+    training_types: ["academic"],
   },
   {
     id: "course-power-bi",
@@ -163,6 +170,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["corporate", "academic", "government"],
   },
   {
     id: "course-uiux",
@@ -183,6 +191,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: true,
     status: "published",
+    training_types: ["academic"],
   },
   {
     id: "course-ethical-hacking",
@@ -203,6 +212,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["corporate", "government"],
   },
   {
     id: "course-graphic-design",
@@ -243,6 +253,7 @@ export const courses: CourseRecord[] = [
     certificate_available: true,
     is_featured: false,
     status: "published",
+    training_types: ["corporate", "government"],
   },
   {
     id: "course-blockchain",

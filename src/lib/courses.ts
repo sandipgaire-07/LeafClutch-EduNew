@@ -15,6 +15,7 @@ import type {
   Instructor,
   PaymentMethod,
 } from "@/types/course";
+import type { TrainingType } from "@/types/training";
 
 const byDisplayOrder = (a: { display_order: number }, b: { display_order: number }) =>
   a.display_order - b.display_order;
@@ -47,6 +48,11 @@ export async function getPublishedCourseBySlug(slug: string): Promise<Course | n
 
 export async function getFeaturedCourses(): Promise<Course[]> {
   return publishedCourses().filter((course) => course.is_featured);
+}
+
+/** Published courses offered on a training page (corporate, academic, government). */
+export async function getCoursesForTraining(type: TrainingType): Promise<Course[]> {
+  return publishedCourses().filter((course) => course.training_types?.includes(type));
 }
 
 /** Categories that have at least one published course, in display order. */

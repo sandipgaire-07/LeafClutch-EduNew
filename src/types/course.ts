@@ -1,3 +1,5 @@
+import type { TrainingType } from "@/types/training";
+
 export type CourseStatus = "draft" | "published" | "archived";
 
 export type LearningMode = "online" | "physical" | "hybrid";
@@ -31,6 +33,8 @@ export interface Course {
   certificate_available: boolean;
   is_featured: boolean;
   status: CourseStatus;
+  /** Training pages this course is offered on. Will become a join table. */
+  training_types?: TrainingType[];
 }
 
 export interface CourseBenefit {
