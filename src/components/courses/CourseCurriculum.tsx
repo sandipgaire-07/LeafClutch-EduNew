@@ -1,13 +1,8 @@
 import { FileDown } from "lucide-react";
 
+import { CourseCurriculumModules } from "@/components/courses/CourseCurriculumModules";
 import { CourseDetailSection } from "@/components/courses/CourseDetailSection";
 import { DownloadCourseCurriculumButton } from "@/components/courses/DownloadCourseCurriculumButton";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { CourseModuleWithLessons } from "@/types/course";
@@ -51,55 +46,7 @@ export function CourseCurriculum({ courseSlug, modules, pdfUrl }: CourseCurricul
       }
       action={download}
     >
-      {modules.length > 0 && (
-        <Accordion
-          multiple
-          defaultValue={[modules[0].id]}
-          className="rounded-xl border bg-white px-5 sm:px-6"
-        >
-          {modules.map((module, index) => (
-            <AccordionItem key={module.id} value={module.id}>
-              <AccordionTrigger className="gap-4 py-5 text-base hover:no-underline">
-                <span className="flex flex-1 items-baseline gap-4">
-                  <span className="font-mono text-sm text-blue-text tabular-nums">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="flex-1">{module.title}</span>
-                  {module.lessons.length > 0 && (
-                    <span className="hidden text-sm font-normal text-muted-foreground sm:inline">
-                      {module.lessons.length} {module.lessons.length === 1 ? "lesson" : "lessons"}
-                    </span>
-                  )}
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-5 pl-9 text-[0.9375rem]">
-                {module.description && (
-                  <p className="text-muted-foreground">{module.description}</p>
-                )}
-                {module.lessons.length > 0 && (
-                  <ol className="space-y-2.5">
-                    {module.lessons.map((lesson, i) => (
-                      <li key={lesson.id} className="flex gap-3">
-                        <span className="w-5 shrink-0 text-right text-muted-foreground tabular-nums">
-                          {i + 1}.
-                        </span>
-                        <span>
-                          <span className="text-foreground">{lesson.title}</span>
-                          {lesson.description && (
-                            <span className="mt-0.5 block text-sm text-muted-foreground">
-                              {lesson.description}
-                            </span>
-                          )}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      )}
+      {modules.length > 0 && <CourseCurriculumModules modules={modules} />}
     </CourseDetailSection>
   );
 }

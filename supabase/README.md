@@ -26,6 +26,8 @@
 
 3. Run `seed.sql`. It loads the content that used to live in `src/data`. Most of it is placeholder copy.
 
+   Then run `seed_courses.sql`: the real course catalogue (fees and instalments from "Our Programs", curriculum and Udemy bonus courses scraped from Udemy). The first time it runs on a database it replaces those courses' curriculum, instalments and Udemy bonus; after that it does nothing.
+
    Migrations and seed are safe to run again, on a new or an existing database. Each part of the seed runs only once per database (tracked in `private.seed_log`), so rows you edit or delete are never brought back or overwritten.
 4. Copy `.env.example` to `.env.local` and fill in the URL and anon key.
 5. Create the admin: add a user under Authentication → Users, then run `select public.promote_to_admin('you@example.com');` in the SQL editor.
