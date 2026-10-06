@@ -8,6 +8,7 @@ import {
   Palette,
   PenTool,
   ShieldCheck,
+  SquareTerminal,
   type LucideIcon,
   type LucideProps,
 } from "lucide-react";
@@ -20,6 +21,7 @@ const categoryIcons: Record<string, LucideIcon> = {
   cybersecurity: ShieldCheck,
   "graphic-design": Palette,
   "cloud-computing": Cloud,
+  programming: SquareTerminal,
 };
 
 export function CategoryIcon({ slug, ...props }: LucideProps & { slug: string }) {

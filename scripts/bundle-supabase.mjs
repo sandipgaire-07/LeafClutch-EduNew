@@ -1,4 +1,4 @@
-// Builds supabase/setup.sql: every migration (in order) followed by the seed,
+// Builds supabase/setup.sql: every migration (in order) followed by the seeds,
 // as one file to paste into the Supabase SQL editor. Safe to run any number
 // of times. Regenerate after adding or changing a migration:
 //
@@ -23,12 +23,13 @@ const header = `-- LeafClutch — complete Supabase setup (generated; do not edi
 -- tables up to date. Each part of the seed runs only once per database, so
 -- rows you edited or deleted in Supabase or the admin are left alone.
 --
--- Generated from supabase/migrations/*.sql and supabase/seed.sql by
--- "npm run db:bundle". Contents: ${migrations.length} migrations, then the seed.
+-- Generated from supabase/migrations/*.sql, supabase/seed.sql and
+-- supabase/seed_courses.sql by "npm run db:bundle". Contents:
+-- ${migrations.length} migrations, then the seeds.
 `;
 
 const body = migrations.map((file) => section(file, readFileSync(join(supabase, "migrations", file), "utf8")));
-body.push(section("seed.sql", readFileSync(join(supabase, "seed.sql"), "utf8")));
+for (const seed of ["seed.sql", "seed_courses.sql"]) body.push(section(seed, readFileSync(join(supabase, seed), "utf8")));
 
 writeFileSync(join(supabase, "setup.sql"), header + body.join(""));
-console.log(`Wrote supabase/setup.sql (${migrations.length} migrations + seed).`);
+console.log(`Wrote supabase/setup.sql (${migrations.length} migrations + seeds).`);

@@ -3,27 +3,24 @@ import { Award } from "lucide-react";
 
 import { getSiteSettings } from "@/lib/content";
 import type { Course } from "@/types/course";
-import logoImage from "../../../public/companyLogo/leafclutch-logo.png";
+import certificateImage from "../../../public/certificate.jpeg";
 
 export async function CourseCertificate({
   course,
-  logoUrl,
 }: {
   course: Pick<Course, "name" | "certificate_available">;
-  logoUrl?: string | null;
 }) {
   // Never imply a certificate the course does not offer.
   if (!course.certificate_available) return null;
 
   const settings = await getSiteSettings();
-  const displayLogo = logoUrl ?? settings.logo_url;
   const companyName = settings.site_name || "LeafClutch";
 
   return (
     <section
       id="certificate"
       aria-labelledby="certificate-heading"
-      className="grid scroll-mt-24 items-center gap-8 rounded-2xl border bg-surface-blue/60 p-6 sm:grid-cols-[minmax(0,1fr)_220px] sm:p-8"
+      className="grid scroll-mt-24 items-center gap-8 rounded-2xl border bg-surface-blue/60 p-6 sm:p-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
     >
       <div>
         <span className="flex size-11 items-center justify-center rounded-lg border bg-white">
@@ -37,33 +34,13 @@ export async function CourseCertificate({
         </p>
       </div>
 
-      {/* Illustrative certificate preview, not the actual design. */}
-      <div aria-hidden className="rotate-1 rounded-lg border bg-white p-2 shadow-card-hover">
-        <div className="rounded border border-surface-blue-strong px-4 py-5 text-center">
-          {displayLogo ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={displayLogo}
-              alt={companyName}
-              className="mx-auto h-6 w-auto max-w-[110px] object-contain sm:h-7"
-            />
-          ) : (
-            <Image
-              src={logoImage}
-              alt={companyName}
-              className="mx-auto h-6 w-auto max-w-[110px] object-contain sm:h-7"
-            />
-          )}
-          <p className="mt-2 text-[0.625rem] font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-            Certificate of Completion
-          </p>
-          <p className="mt-2 text-sm font-semibold text-navy">{course.name}</p>
-          <div className="mx-auto mt-4 h-px w-16 bg-border" />
-          <p className="mt-1.5 text-[0.625rem] text-muted-foreground">
-            {settings.site_name || "LeafClutch Technologies"}
-          </p>
-        </div>
-      </div>
+      <Image
+        src={certificateImage}
+        alt={`Sample ${companyName} certificate of completion`}
+        placeholder="blur"
+        sizes="(min-width: 1024px) 460px, (min-width: 768px) 55vw, 100vw"
+        className="h-auto w-full rounded-lg border bg-white shadow-card-hover"
+      />
     </section>
   );
 }
