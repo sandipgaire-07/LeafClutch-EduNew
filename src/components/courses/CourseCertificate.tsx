@@ -14,7 +14,7 @@ export async function CourseCertificate({
   if (!course.certificate_available) return null;
 
   const settings = await getSiteSettings();
-  const companyName = settings.site_name || "LeafClutch";
+  const companyName = settings.site_name || "Leafclutch";
 
   return (
     <section

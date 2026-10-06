@@ -28,7 +28,7 @@ export default async function AdminLoginPage() {
             <Logo logoUrl={settings.logo_url} siteName={settings.site_name} />
             <h1 className="mt-6 text-2xl font-semibold text-foreground">Admin sign in</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Welcome back. Sign in to manage your LeafClutch content.
+              Welcome back. Sign in to manage your Leafclutch content.
             </p>
           </div>
 
